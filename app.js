@@ -1,6 +1,6 @@
 'use strict';
 // Yahoo Finance chart API is accessed through the companion Cloudflare Worker.
-const PROXY_BASE='https://check.petdamon.workers.dev';
+const PROXY_BASE='https://pmc.mcraft-tiger-574.workers.dev';
 const $=id=>document.getElementById(id);
 const blank='—';
 const groups=[
@@ -250,7 +250,7 @@ function makeSummary(){
     }
     if(!row.items?.length)return;
     const line=document.createElement('div');
-    line.className='summary-row'+(row.m7?' m7-summary-row':'')+(row.firstM7?' m7-first-row':'')+(row.single?' single-index-row':'')+(row.before?' summary-divider-before':'')+(row.after?' summary-divider-after':'');
+    line.className='summary-row'+(row.m7?' m7-summary-row':'')+(row.firstM7?' m7-first-row':'')+(row.items.some(ref=>ref.id==='skhy')?' skhy-single-row':'')+(row.single?' single-index-row':'')+(row.before?' summary-divider-before':'')+(row.after?' summary-divider-after':'');
     line.style.setProperty('--cols',row.items.length);
     row.items.forEach(ref=>{
       const cell=makeSummaryCell(ref);

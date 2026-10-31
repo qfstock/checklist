@@ -320,3 +320,18 @@
   .summary-row.m7-first-row{gap:3px;}
   .summary-row.m7-first-row > .summary-cell{width:calc(50% - 1.5px);}
 }
+
+
+/* SK hynix ADR 카드도 M7 첫 번째 카드와 같은 50% 폭으로 중앙 배치 */
+.summary-row.skhy-single-row{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.summary-row.skhy-single-row > .summary-cell{
+  grid-column:1 / -1;
+  width:calc(50% - 2.5px);
+  justify-self:center;
+}
+@media(max-width:520px){
+  .summary-row.skhy-single-row{gap:3px;}
+  .summary-row.skhy-single-row > .summary-cell{width:calc(50% - 1.5px);}
+}
