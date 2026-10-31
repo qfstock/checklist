@@ -290,13 +290,16 @@ function makeCharts(){
       if(item.id==='sox'){
         const toggle=createSemiconductorToggle();toggle.classList.add('semiconductor-toggle-in-chart');card.appendChild(toggle);
         semiconductorWrap=document.createElement('div');semiconductorWrap.className='chart-semiconductor-content';semiconductorWrap.dataset.semiconductorContent='true';semiconductorWrap.hidden=!semiconductorExpanded;card.appendChild(semiconductorWrap);
-        const activityControls=document.createElement('div');activityControls.className='activity-chart-controls';
+        // 거래대금/거래량 컨트롤은 SOX 차트 카드 밖에 각각 독립 카드로 배치한다.
+        // SOX 차트 카드 안에는 반도체 16종목 펼치기 버튼만 남긴다.
         Object.entries(ACTIVITY_TYPES).forEach(([type,config])=>{
-          const controlCell=document.createElement('div');controlCell.className='activity-chart-control-cell';
+          const controlCell=document.createElement('article');
+          controlCell.className='chart-card activity-chart-control-cell';
+          controlCell.dataset.activityControlCard=type;
           const button=document.createElement('button');button.type='button';button.className='activity-toggle';button.dataset.activityToggle=type;button.textContent=`${config.label} ${config.expanded?'접기 ▲':'펼치기 ▼'}`;button.setAttribute('aria-expanded',String(config.expanded));button.addEventListener('click',()=>toggleActivity(type));controlCell.appendChild(button);
-          const activityGrid=document.createElement('div');activityGrid.className='activity-chart-grid';activityGrid.id=config.chartContainerId;activityGrid.hidden=!config.expanded;controlCell.appendChild(activityGrid);activityControls.appendChild(controlCell);
+          const activityGrid=document.createElement('div');activityGrid.className='activity-chart-grid';activityGrid.id=config.chartContainerId;activityGrid.hidden=!config.expanded;controlCell.appendChild(activityGrid);
+          root.appendChild(controlCell);
         });
-        card.appendChild(activityControls);
       }
     });
   });
