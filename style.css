@@ -258,6 +258,10 @@
   box-shadow:none;
 }
 .chart-semiconductor-content .chart-card.chart-divider-before{margin-top:0;padding-top:12px;border-top:1px solid #dce3ec;}
+/* 펼친 SOX 16종목 차트는 숨김 상태에서 생성된 뒤에도 각 카드의 전체 너비를 사용 */
+.chart-semiconductor-content{width:100%;align-items:stretch;}
+.chart-semiconductor-content .chart-card{width:100%;min-width:0;flex:0 0 auto;}
+.chart-semiconductor-content .chart-area{width:100%;min-width:0;}
 @media(max-width:760px){
   .semiconductor-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;}
   .semiconductor-summary-grid .summary-cell{padding:7px 7px;}

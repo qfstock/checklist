@@ -1,6 +1,6 @@
 'use strict';
 // Yahoo Finance chart API is accessed through the companion Cloudflare Worker.
-const PROXY_BASE='https://check.petdamon.workers.dev';
+const PROXY_BASE='https://pmc.mcraft-tiger-574.workers.dev';
 const $=id=>document.getElementById(id);
 const blank='—';
 const groups=[
@@ -70,8 +70,57 @@ function updateSemiconductorToggles(){
     button.textContent=semiconductorExpanded?'필라델피아 반도체 지수 구성 종목(시가총액 상위 16종목) 접기 ▲':'필라델피아 반도체 지수 구성 종목(시가총액 상위 16종목) 펼치기 ▼';
     button.setAttribute('aria-expanded',String(semiconductorExpanded));
   });
-  if(semiconductorExpanded)requestAnimationFrame(resizeCharts);
+  if(semiconductorExpanded){
+    // The 16 semiconductor chart cards are initially inside a hidden wrapper.
+    // Re-measure only these charts after the wrapper has completed layout so
+    // Lightweight Charts does not retain the narrow/zero width from its hidden state.
+    requestAnimationFrame(()=>requestAnimationFrame(resizeSemiconductorCharts));
+    window.setTimeout(resizeSemiconductorCharts,100);
+  }
 }
+function resizeSemiconductorCharts(){
+  document.querySelectorAll('.chart-semiconductor-content .chart-card').forEach(card=>{
+    const id=card.id.replace(/^chart-card-/,'');
+    const entry=charts.get(id);
+    const container=card.querySelector('.chart-area');
+    if(!entry||!container||container.clientWidth<=0)return;
+    const width=Math.floor(container.getBoundingClientRect().width);
+    const height=Math.floor(container.getBoundingClientRect().height);
+    if(width<=0||height<=0)return;
+
+    // 펼치기 전 숨겨진 상태에서 만들어진 차트는 최초 너비와 시간축 간격이
+    // 0 또는 잘못된 값으로 남을 수 있으므로, 실제 너비를 적용한 뒤 선택 기간을 재계산합니다.
+    entry.chart.applyOptions({width,height});
+    const values=dataById.get(id)?.values||[];
+    if(!values.length)return;
+
+    const toolbar=card.querySelector('.chart-range-toolbar');
+    const selected=toolbar?.querySelector('button.selected')?.dataset.range||'3M';
+    const last=values[values.length-1].time;
+    const first=values[0].time;
+    const days={
+      '1M':31,'3M':92,'6M':184,'YTD':Math.ceil(
+        (Date.now()-new Date(new Date().getFullYear(),0,1).getTime())/86400000
+      ),'1Y':366,'ALL':730
+    }[selected]||92;
+    let from=selected==='ALL'?first:
+      selected==='YTD'?Math.max(first,Math.floor(new Date(new Date().getFullYear(),0,1).getTime()/1000)):
+      Math.max(first,last-days*86400);
+    const visibleCount=values.filter(point=>point.time>=from&&point.time<=last).length;
+    const plotWidth=Math.max(120,width-58);
+    const barSpacing=Math.max(.25,Math.min(7,plotWidth/Math.max(1,visibleCount)));
+
+    entry.chart.applyOptions({timeScale:{
+      minBarSpacing:.25,
+      barSpacing,
+      rightOffset:0
+    }});
+    requestAnimationFrame(()=>{
+      try{entry.chart.timeScale().setVisibleRange({from,to:last});}catch(error){}
+    });
+  });
+}
+
 function createSemiconductorToggle(){
   const button=document.createElement('button');
   button.type='button';button.className='semiconductor-toggle';
