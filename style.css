@@ -335,3 +335,14 @@
   .summary-row.skhy-single-row{gap:3px;}
   .summary-row.skhy-single-row > .summary-cell{width:calc(50% - 1.5px);}
 }
+
+
+/* SK hynix ADR: outer card matches the SOX index card; session panel matches the SOX top-16 toggle button. */
+.summary-cell.skhy-reversed-summary-cell{
+  background:#eef1f5!important;
+  border-color:#e2e7ee!important;
+}
+.summary-cell.skhy-reversed-summary-cell .summary-session-box{
+  background:var(--soft)!important;
+  border:0!important;
+}
